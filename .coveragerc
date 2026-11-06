@@ -1,0 +1,8 @@
+[run]
+branch = True
+source = bot_core,bot
+
+[report]
+show_missing = True
+exclude_also =
+    if __name__ == .__main__.:
