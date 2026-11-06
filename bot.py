@@ -19,6 +19,7 @@ LOG = logging.getLogger(__name__)
 HELP = (
     "Commands (also available with !):\n"
     "/create_character name personality tags - create; tags are comma-separated\n"
+    "/delete_character name - permanently delete one of your characters\n"
     "/character_info name - personality, tags, and latest memories\n"
     "/characters tag - alphabetical names, optionally filtered by tag\n"
     "/remember name fact - add a memory\n/undo - undo your latest memory addition\n"
@@ -61,6 +62,12 @@ class CharacterCommands(commands.Cog):
         result = self.repository.mutate(
             self.scope(ctx), lambda w: w.create(name, personality, tags)
         )
+        await send_text(ctx, result)
+
+    @commands.hybrid_command(name="delete_character", description="Delete one of your characters.")
+    async def delete_character(self, ctx: commands.Context, name: str) -> None:
+        await ctx.defer(ephemeral=True)
+        result = self.repository.mutate(self.scope(ctx), lambda w: w.delete(name))
         await send_text(ctx, result)
 
     @commands.hybrid_command(name="character_info", description="Show one of your characters.")

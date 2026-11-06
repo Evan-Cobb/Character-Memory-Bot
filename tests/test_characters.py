@@ -30,6 +30,29 @@ class CharacterTests(unittest.TestCase):
         self.workspace.create("Bea", "Calm")
         self.assertEqual(self.workspace.names(), ["Ada", "Bea", "Zoe"])
 
+    def test_delete_removes_character_and_related_session_state(self):
+        self.workspace.create("Bea", "Calm")
+        self.workspace.remember("Ada", "Remove this undo")
+        self.workspace.remember("Bea", "Keep this undo")
+        self.workspace.enqueue("Ada", "Remove this request")
+        self.workspace.enqueue("Bea", "Keep this request")
+
+        self.assertEqual(self.workspace.delete("Ada"), "Deleted Ada.")
+        self.assertEqual(self.workspace.names(), ["Bea"])
+        with self.assertRaises(ValueError):
+            self.workspace.info("Ada")
+        self.assertEqual(self.workspace.undo(), "Undid the last memory added to Bea.")
+        self.assertIn("Keep this request", self.workspace.process_next())
+        self.assertEqual(self.workspace.undo(), "Undid the last memory added to Bea.")
+        with self.assertRaises(ValueError):
+            self.workspace.undo()
+
+    def test_delete_missing_character_does_not_change_workspace(self):
+        before = self.workspace.to_data()
+        with self.assertRaises(ValueError):
+            self.workspace.delete("Missing")
+        self.assertEqual(self.workspace.to_data(), before)
+
     def test_duplicate_rejected_without_mutation(self):
         before = self.workspace.to_data()
         with self.assertRaises(ValueError):

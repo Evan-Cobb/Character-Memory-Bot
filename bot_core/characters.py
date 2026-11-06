@@ -58,6 +58,17 @@ class Workspace:
         self._names.insert(key)
         return f"Created {name}."
 
+    def delete(self, name: str) -> str:
+        key, character = self._find(name)
+        self._names.delete(key)
+        del self._characters[key]
+        self._requests.remove_if(lambda request: request.character_key == key)
+        self._undo = deque(
+            ((undo_key, fact) for undo_key, fact in self._undo if undo_key != key),
+            maxlen=MAX_UNDO,
+        )
+        return f"Deleted {character.name}."
+
     def _find(self, name: str) -> tuple[str, Character]:
         key = text(name, "Name", 80).casefold()
         if key not in self._characters:

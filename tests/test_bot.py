@@ -44,6 +44,7 @@ class BotTests(unittest.IsolatedAsyncioTestCase):
         expected = {
             "help",
             "create_character",
+            "delete_character",
             "character_info",
             "characters",
             "remember",
@@ -136,6 +137,16 @@ class BotTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.bot.repository.get("1:2").names(), ["Ada"])
         self.assertNotIn("rolled back", error_message(caught.exception))
 
+    async def test_delete_character_command_persists_removal(self):
+        ctx = self.context()
+        await self.invoke("create_character", ctx, "Ada", "Curious")
+        await self.invoke("delete_character", ctx, "Ada")
+        with self.assertRaises(ValueError):
+            await self.invoke("character_info", ctx, "Ada")
+        restored = type(self.bot.repository)(self.settings.data_path)
+        restored.load()
+        self.assertEqual(restored.get("1:2").names(), [])
+
     async def test_app_errors_use_initial_or_followup_response(self):
         command = self.bot.tree.get_command("remember")
         error = app_commands.CommandInvokeError(command, ValueError("Invalid memory"))
@@ -157,7 +168,7 @@ class BotTests(unittest.IsolatedAsyncioTestCase):
         with patch("builtins.print") as output:
             await offline_check()
         messages = " ".join(str(call.args[0]) for call in output.call_args_list)
-        self.assertIn("8 slash/prefix commands", messages)
+        self.assertIn("9 slash/prefix commands", messages)
         self.assertIn("save/reload", messages)
 
     async def test_failed_queue_save_preserves_pending_memory_for_retry(self):
@@ -184,6 +195,8 @@ class BotTests(unittest.IsolatedAsyncioTestCase):
     async def test_documented_prefix_commands_use_real_argument_parser(self):
         self.bot._connection.user = SimpleNamespace(id=999)
         examples = (
+            '!create_character "Ada Lovelace" "Curious and thoughtful" "science,kind"',
+            '!delete_character "Ada Lovelace"',
             '!create_character "Ada Lovelace" "Curious and thoughtful" "science,kind"',
             '!enqueue "Ada Lovelace" "First queued fact"',
             "!next",

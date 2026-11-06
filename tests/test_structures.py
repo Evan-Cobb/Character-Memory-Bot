@@ -37,6 +37,15 @@ class QueueTests(unittest.TestCase):
             self.assertEqual(len(queue), len(reference))
             self.assertEqual(list(queue), list(reference))
 
+    def test_remove_if_preserves_remaining_fifo_items(self):
+        queue = LinkedQueue()
+        for value in ("keep", "remove", "keep", "remove"):
+            queue.enqueue(value)
+        self.assertEqual(queue.remove_if(lambda value: value == "remove"), 2)
+        self.assertEqual(list(queue), ["keep", "keep"])
+        self.assertEqual(queue.dequeue(), "keep")
+        self.assertEqual(queue.dequeue(), "keep")
+
 
 class TreeTests(unittest.TestCase):
     def test_empty(self):
@@ -72,3 +81,14 @@ class TreeTests(unittest.TestCase):
             tree.insert(name)
         self.assertEqual(list(tree), sorted(set(names)))
         self.assertEqual(len(tree), len(set(names)))
+
+    def test_delete_leaf_one_child_two_children_and_missing(self):
+        tree = NameTree()
+        for name in ("m", "c", "z", "a", "e", "d", "f"):
+            tree.insert(name)
+        self.assertTrue(tree.delete("a"))
+        self.assertTrue(tree.delete("e"))
+        self.assertTrue(tree.delete("m"))
+        self.assertFalse(tree.delete("missing"))
+        self.assertEqual(list(tree), ["c", "d", "f", "z"])
+        self.assertEqual(len(tree), 4)

@@ -1,4 +1,6 @@
-"""Queue and unbalanced search tree used by the CSE212 character bot."""
+"""Queue and unbalanced search tree used by the character bot."""
+
+from collections.abc import Callable
 
 
 class _Link:
@@ -49,6 +51,21 @@ class LinkedQueue:
             yield node.value
             node = node.next
 
+    def remove_if(self, predicate: Callable[[object], bool]) -> int:
+        """Remove matching values and return the number removed."""
+        kept = LinkedQueue()
+        removed = 0
+        while self._head is not None:
+            value = self.dequeue()
+            if predicate(value):
+                removed += 1
+            else:
+                kept.enqueue(value)
+        self._head = kept._head
+        self._tail = kept._tail
+        self._size = kept._size
+        return removed
+
 
 class _TreeNode:
     def __init__(self, key):
@@ -96,6 +113,36 @@ class NameTree:
                 return True
             node = node.left if key < node.key else node.right
         return False
+
+    def delete(self, key):
+        """Remove a key while preserving BST ordering. Returns whether it existed."""
+        parent = None
+        node = self._root
+        while node is not None and node.key != key:
+            parent = node
+            node = node.left if key < node.key else node.right
+        if node is None:
+            return False
+
+        if node.left is not None and node.right is not None:
+            successor_parent = node
+            successor = node.right
+            while successor.left is not None:
+                successor_parent = successor
+                successor = successor.left
+            node.key = successor.key
+            parent = successor_parent
+            node = successor
+
+        replacement = node.left if node.left is not None else node.right
+        if parent is None:
+            self._root = replacement
+        elif parent.left is node:
+            parent.left = replacement
+        else:
+            parent.right = replacement
+        self._size -= 1
+        return True
 
     def __iter__(self):
         """In-order traversal: O(n) time, O(h) extra stack space."""

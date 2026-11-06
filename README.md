@@ -19,7 +19,7 @@ if (-not (Test-Path ".venv\Scripts\python.exe")) { py -3 -m venv .venv }
 
 If you already have the project, open PowerShell in its folder and skip the clone. Activation is not necessary when using the explicit executable.
 
-The check should report **8 commands** and a successful create/filter/tree/FIFO/undo/isolation/save-reload exercise. It uses temporary storage, needs no token, does not contact Discord, and does not change your saved characters.
+The check should report **9 commands** and a successful create/filter/tree/FIFO/undo/isolation/save-reload exercise. It uses temporary storage, needs no token, does not contact Discord, and does not change your saved characters.
 
 ## 2. Configure Discord once
 
@@ -54,7 +54,7 @@ From the same project folder:
 .\.venv\Scripts\python.exe bot.py
 ```
 
-Wait for **Registered 8 slash commands** and **Connected as ...**. Keep the terminal running. Press **Ctrl+C** to stop. You do not need to run any other Python file or start a web server.
+Wait for **Registered 9 slash commands** and **Connected as ...**. Keep the terminal running. Press **Ctrl+C** to stop. You do not need to run any other Python file or start a web server.
 
 ## 4. Try it in Discord
 
@@ -73,12 +73,13 @@ Use these messages in a channel where the bot can send messages. These exact for
 
 The final info should contain **First queued fact**, not **Second direct fact**. `!undo` reverses the latest memory addition; `!next` saves the oldest queued fact.
 
-The same eight commands are slash commands. In Discord's slash UI, supply the named fields shown below:
+The same nine commands are slash commands. In Discord's slash UI, supply the named fields shown below:
 
 | Command | Fields | Behavior |
 |---|---|---|
 | `/help` | none | List commands |
 | `/create_character` | name, personality, optional tags | Create your character; tags are comma-separated |
+| `/delete_character` | name | Permanently delete your character and its session data |
 | `/character_info` | name | Show profile and five latest memories |
 | `/characters` | optional tag | Browse your characters alphabetically |
 | `/remember` | name, fact | Save a memory immediately |

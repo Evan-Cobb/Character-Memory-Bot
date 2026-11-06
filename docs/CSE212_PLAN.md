@@ -2,7 +2,7 @@
 
 ## Project explanation
 
-I built this project as a Discord bot that lets each user create characters, organize them with tags, add memories, undo recent changes, and process queued memory additions in order. The Discord commands are only the user interface. The main purpose of the project is the data management underneath the interface.
+I built this project as a Discord bot that lets each user create and delete characters, organize them with tags, add memories, undo recent changes, and process queued memory additions in order. The Discord commands are only the user interface. The main purpose of the project is the data management underneath the interface.
 
 The project is organized so that the Discord code, application rules, data structures, and file storage have separate responsibilities. The command code in [`bot.py`](../bot.py) receives user input and displays results. The application behavior is in [`bot_core/characters.py`](../bot_core/characters.py), the custom structures are in [`bot_core/structures.py`](../bot_core/structures.py), and persistence is in [`bot_core/storage.py`](../bot_core/storage.py). This separation makes the algorithms easier to reason about and test without connecting to Discord.
 
